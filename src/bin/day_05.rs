@@ -28,7 +28,43 @@ pub fn part1(input: &str) -> u32 {
 }
 
 pub fn part2(input: &str) -> u32 {
-    0
+    let (r, updates) = input.split_once("\n\n").unwrap();
+    let rules: HashSet<(u32, u32)> = r
+        .lines()
+        .map(|line| {
+            let mut numbers = line.split('|').filter_map(|n| n.parse().ok());
+            (numbers.next().unwrap(), numbers.next().unwrap())
+        })
+        .collect();
+
+    let mut mid_elements = Vec::new();
+    for update in updates
+        .lines()
+        .map(|update| update.split(',').filter_map(|x| x.parse().ok()))
+    {
+        let mut update: Vec<u32> = update.collect();
+        let mut modified = false;
+        'outer: loop {
+            // Find next wrong element
+            for (x, current) in update.iter().enumerate() {
+                for (y, previous) in update[..x].iter().enumerate() {
+                    if rules.contains(&(*current, *previous)) {
+                        // Found wrong pair, swap them
+                        update.swap(x, y);
+                        modified = true;
+                        continue 'outer;
+                    }
+                }
+            }
+            break;
+        }
+        // No more wrong elements
+        if !modified {
+            continue;
+        }
+        mid_elements.push(update[(update.len() - 1) / 2])
+    }
+    mid_elements.into_iter().sum()
 }
 
 const INPUT: &str = include_str!("../../inputs/day_05.txt");
@@ -81,12 +117,10 @@ mod test {
         assert_eq!(part1(EXAMPLE_INPUT_1), 143);
     }
 
-    const EXAMPLE_INPUT_2: &str = "\
-s
-";
+    const EXAMPLE_INPUT_2: &str = EXAMPLE_INPUT_1;
 
     #[test]
     fn test_part_2() {
-        assert_eq!(part2(EXAMPLE_INPUT_2), 0);
+        assert_eq!(part2(EXAMPLE_INPUT_2), 123);
     }
 }
