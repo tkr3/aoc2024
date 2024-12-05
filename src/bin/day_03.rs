@@ -10,7 +10,7 @@ pub fn part1(input: &str) -> i32 {
             if let Ok(result) = parsed {
                 sum += result;
             } else {
-                eprintln!("{}", parsed.unwrap_err());
+                // eprintln!("{}", parsed.unwrap_err());
             }
             continue;
         }
@@ -33,7 +33,7 @@ pub fn part2(input: &str) -> i32 {
                         sum += result;
                     }
                 } else {
-                    eprintln!("{}", parsed.unwrap_err());
+                    // eprintln!("{}", parsed.unwrap_err());
                 }
             }
             'd' => {
@@ -41,7 +41,7 @@ pub fn part2(input: &str) -> i32 {
                 if let Ok(result) = parsed {
                     enabled = result;
                 } else {
-                    eprintln!("{}", parsed.unwrap_err());
+                    // eprintln!("{}", parsed.unwrap_err());
                 }
             }
             _ => {
