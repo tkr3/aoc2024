@@ -4,6 +4,7 @@ pkgs.mkShell {
     rustc
     cargo
     cargo-watch
+    cargo-flamegraph
     gcc
     rustfmt
     clippy
