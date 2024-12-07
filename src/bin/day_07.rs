@@ -5,13 +5,12 @@ pub fn part1(input: &str) -> u64 {
         .lines()
         .filter_map(|line| {
             let (a, b) = line.split_once(": ").unwrap();
-            dbg!(a, b);
-            let result = a.parse().unwrap();
+            let result: u64 = a.parse().unwrap();
             let operands: Vec<u64> = b
                 .split_ascii_whitespace()
                 .filter_map(|s| s.parse().ok())
                 .collect();
-            let ltr = LtR::new(&operands);
+            let ltr = LtR::new(&operands, 2);
             for res in ltr {
                 if res == result {
                     return Some(result);
@@ -23,22 +22,41 @@ pub fn part1(input: &str) -> u64 {
 }
 
 pub fn part2(input: &str) -> u64 {
-    0
+    input
+        .lines()
+        .filter_map(|line| {
+            let (a, b) = line.split_once(": ").unwrap();
+            let result: u64 = a.parse().unwrap();
+            let operands: Vec<u64> = b
+                .split_ascii_whitespace()
+                .filter_map(|s| s.parse().ok())
+                .collect();
+            let ltr = LtR::new(&operands, 3);
+            for res in ltr {
+                if res == result {
+                    return Some(result);
+                }
+            }
+            None
+        })
+        .sum()
 }
 
 struct LtR<'a> {
     operands: &'a [u64],
-    state: u64,
-    max_state: u64,
+    operator_count: usize,
+    state: usize,
+    max_state: usize,
 }
 
 impl<'a> LtR<'a> {
-    fn new(operands: &'a [u64]) -> Self {
-        let max_state = 2u64.pow(operands.len() as u32);
+    fn new(operands: &'a [u64], operator_count: usize) -> Self {
+        let max_state = operator_count.pow(operands.len() as u32 - 1);
         LtR {
             operands,
-            state: 0,
+            operator_count,
             max_state,
+            state: 0,
         }
     }
 }
@@ -47,13 +65,18 @@ impl Iterator for LtR<'_> {
     type Item = u64;
 
     fn next(&mut self) -> Option<Self::Item> {
-        if self.state >= self.max_state {
+        if self.state > self.max_state {
             return None;
         }
         let mut operands = self.operands.iter();
         let first = operands.next().unwrap();
         let result = operands.enumerate().fold(*first, |acc, (index, current)| {
-            match (self.state >> index) & 1 {
+            match self
+                .state
+                .saturating_div(self.operator_count.pow(index as u32))
+                % self.operator_count
+            {
+                2 => concat_numbers(acc, *current),
                 1 => acc * current,
                 0 => acc + current,
                 _ => {
@@ -64,6 +87,10 @@ impl Iterator for LtR<'_> {
         self.state += 1;
         Some(result)
     }
+}
+
+fn concat_numbers(a: u64, b: u64) -> u64 {
+    a * 10u64.pow((b as f32).log10() as u32 + 1) + b
 }
 
 aoc2024::main!("../../inputs/day_07.txt");
@@ -81,5 +108,5 @@ aoc2024::test!(
 292: 11 6 16 20
 ",
     3749,
-    1
+    11387
 );
