@@ -10,7 +10,7 @@ pub fn part1(input: &str) -> u64 {
                 .split_ascii_whitespace()
                 .filter_map(|s| s.parse().ok())
                 .collect();
-            let ltr = LtR::new(&operands, 2);
+            let ltr = LtR::new(&operands, 2, result);
             for res in ltr {
                 if res == result {
                     return Some(result);
@@ -31,7 +31,7 @@ pub fn part2(input: &str) -> u64 {
                 .split_ascii_whitespace()
                 .filter_map(|s| s.parse().ok())
                 .collect();
-            let ltr = LtR::new(&operands, 3);
+            let ltr = LtR::new(&operands, 3, result);
             for res in ltr {
                 if res == result {
                     return Some(result);
@@ -47,16 +47,18 @@ struct LtR<'a> {
     operator_count: usize,
     state: usize,
     max_state: usize,
+    expected_result: u64,
 }
 
 impl<'a> LtR<'a> {
-    fn new(operands: &'a [u64], operator_count: usize) -> Self {
+    fn new(operands: &'a [u64], operator_count: usize, expected_result: u64) -> Self {
         let max_state = operator_count.pow(operands.len() as u32 - 1);
         LtR {
             operands,
             operator_count,
             max_state,
             state: 0,
+            expected_result,
         }
     }
 }
@@ -69,13 +71,14 @@ impl Iterator for LtR<'_> {
             return None;
         }
         let mut operands = self.operands.iter();
-        let first = operands.next().unwrap();
-        let result = operands.enumerate().fold(*first, |acc, (index, current)| {
-            match self
-                .state
-                .saturating_div(self.operator_count.pow(index as u32))
-                % self.operator_count
-            {
+        let mut acc = *operands.next().unwrap();
+        for (index, current) in operands.enumerate() {
+            if self.expected_result < acc {
+                return None;
+            }
+            let operation =
+                self.state / (self.operator_count.pow(index as u32)) % self.operator_count;
+            acc = match operation {
                 2 => concat_numbers(acc, *current),
                 1 => acc * current,
                 0 => acc + current,
@@ -83,14 +86,20 @@ impl Iterator for LtR<'_> {
                     panic!("Invalid operation")
                 }
             }
-        });
+        }
         self.state += 1;
-        Some(result)
+        Some(acc)
     }
 }
 
 fn concat_numbers(a: u64, b: u64) -> u64 {
-    a * 10u64.pow((b as f32).log10() as u32 + 1) + b
+    let mut b2 = b;
+    let mut a = a;
+    while b2 > 0 {
+        b2 /= 10;
+        a *= 10;
+    }
+    a + b
 }
 
 aoc2024::main!("../../inputs/day_07.txt");
