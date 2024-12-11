@@ -1,14 +1,15 @@
 { pkgs ? import <nixpkgs> { } }:
 pkgs.mkShell {
   nativeBuildInputs = with pkgs; [
-    rustc
     cargo
-    cargo-watch
     cargo-flamegraph
-    gcc
-    rustfmt
+    cargo-watch
     clippy
+    gcc
+    gnuplot
     rust-analyzer
+    rustc
+    rustfmt
   ];
 
   # Certain Rust tools won't work without this
