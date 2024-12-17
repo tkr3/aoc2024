@@ -1,3 +1,5 @@
+pub mod util;
+
 #[macro_export]
 macro_rules! main {
     ($input:expr) => {
@@ -7,6 +9,15 @@ macro_rules! main {
             println!("Part 1: {}", part1(INPUT));
 
             println!("Part 2: {}", part2(INPUT));
+        }
+    };
+    ($input:expr, $($param:expr),+) => {
+        static INPUT: &str = include_str!($input);
+
+        fn main() {
+            println!("Part 1: {}", part1(INPUT, $($param),*));
+
+            println!("Part 2: {}", part2(INPUT, $($param),*));
         }
     };
 }
@@ -42,6 +53,22 @@ macro_rules! test {
             #[test]
             fn test_part2() {
                 assert_eq!(part2($input2), $part2);
+            }
+        }
+    };
+    ($input:expr $(,$param:expr),*; $part1:expr, $part2:expr) => {
+        #[cfg(test)]
+        mod tests {
+            use super::*;
+
+            #[test]
+            fn test_part1() {
+                assert_eq!(part1($input $(,$param),*), $part1);
+            }
+
+            #[test]
+            fn test_part2() {
+                assert_eq!(part2($input $(,$param),*), $part2);
             }
         }
     };
