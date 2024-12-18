@@ -56,19 +56,19 @@ macro_rules! test {
             }
         }
     };
-    ($input:expr $(,$param:expr),*; $part1:expr, $part2:expr) => {
+    ($input:expr, $($param:expr),*; $part1:expr, $part2:expr) => {
         #[cfg(test)]
         mod tests {
             use super::*;
 
             #[test]
             fn test_part1() {
-                assert_eq!(part1($input $(,$param),*), $part1);
+                assert_eq!(part1($input, $($param),*), $part1);
             }
 
             #[test]
             fn test_part2() {
-                assert_eq!(part2($input $(,$param),*), $part2);
+                assert_eq!(part2($input, $($param),*), $part2);
             }
         }
     };

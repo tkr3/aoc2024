@@ -1,6 +1,6 @@
-use std::ops::Add;
+use std::{fmt::Display, ops::Add};
 
-#[derive(Debug, Default, Clone, Copy)]
+#[derive(Debug, Default, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct U2d(pub usize, pub usize);
 
 impl Add<I2d> for U2d {
@@ -29,7 +29,13 @@ impl From<(usize, usize)> for U2d {
     }
 }
 
-#[derive(Debug, Default, Clone, Copy)]
+impl Display for U2d {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.0, self.1)
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, Hash, Eq, PartialEq)]
 pub struct I2d(pub isize, pub isize);
 
 impl Add for I2d {
@@ -56,4 +62,29 @@ impl TryFrom<u8> for I2d {
             c => Err(format!("invalid character: {}", c as char)),
         }
     }
+}
+
+impl Display for I2d {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "({}, {})", self.0, self.1)
+    }
+}
+
+pub const DIRECTIONS_4: [I2d; 4] = [I2d(1, 0), I2d(-1, 0), I2d(0, 1), I2d(0, -1)];
+pub const DIRECTIONS_8: [I2d; 8] = [
+    I2d(1, 0),
+    I2d(-1, 0),
+    I2d(0, 1),
+    I2d(0, -1),
+    I2d(-1, -1),
+    I2d(1, 1),
+    I2d(-1, 1),
+    I2d(1, -1),
+];
+
+pub const fn symmetric_grid<const SIZE: usize>() -> [[bool; SIZE]; SIZE] {
+    grid::<SIZE, SIZE>()
+}
+pub const fn grid<const SIZE_X: usize, const SIZE_Y: usize>() -> [[bool; SIZE_X]; SIZE_Y] {
+    [[false; SIZE_X]; SIZE_Y]
 }
