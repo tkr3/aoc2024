@@ -10,7 +10,15 @@ pkgs.mkShell {
     rust-analyzer
     rustc
     rustfmt
+    vulkan-headers
+    vulkan-loader
+    vulkan-tools
+    vulkan-validation-layers
   ];
+
+  shellHook = ''
+    export LD_LIBRARY_PATH="${pkgs.lib.makeLibraryPath [ pkgs.vulkan-loader ]}:$LD_LIBRARY_PATH"
+  '';
 
   # Certain Rust tools won't work without this
   # This can also be fixed by using oxalica/rust-overlay and specifying the rust-src extension
